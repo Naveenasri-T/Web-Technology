@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .quiz-container {
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+            width: 60%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            animation: zoomIn 0.5s ease-in-out;
+        }
+
+        @keyframes zoomIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        h1 {
+            font-size: 3em;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            animation: fadeInDown 1s ease;
+        }
+
+        @keyframes fadeInDown {
+            0% { opacity: 0; transform: translateY(-50px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress, .timer, .question, .options, .score {
+            margin: 20px 0;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #555;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        #progress-fill {
+            height: 20px;
+            background-color: #4caf50;
+            width: 10%;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #4caf50;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        button:disabled {
+            background-color: grey;
+            cursor: not-allowed;
+        }
+
+        #background-music {
+            position: absolute;
+            top: -1000px; /* Hide the audio player */
+        }
+
+        .intro-video {
+            margin: 20px auto;
+            width: 80%;
+            border-radius: 15px;
+        }
+
+        .options button {
+            display: block;
+            margin: 10px auto;
+            padding: 15px;
+            width: 50%;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Ultimate Quiz Challenge</h1>
+        
+        <!-- Embedded YouTube video introduction -->
+        <iframe class="intro-video" width="560" height="315" 
+                src="https://www.youtube.com/embed/4uJLLev3Ulg?autoplay=1&mute=0" 
+                frameborder="0" 
+                allow="autoplay; encrypted-media" 
+                allowfullscreen>
+        </iframe>
+
+        <!-- Background music -->
+        <audio id="background-music" autoplay loop>
+            <source src="C:/Users/Dell/Desktop/web/quiz/2/backgroungaudio.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+
+        <div class="progress">
+            Question <span id="current-question">1</span> of <span id="total-questions">10</span>
+            <div class="progress-bar">
+                <div id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="timer" id="timer">30</div>
+        <div class="question" id="question">What is the capital of France?</div>
+        <div class="options" id="options">
+            <button class="option-btn" data-answer="false">Berlin</button>
+            <button class="option-btn" data-answer="false">Madrid</button>
+            <button class="option-btn" data-answer="true">Paris</button>
+            <button class="option-btn" data-answer="false">Rome</button>
+        </div>
+
+        <button id="next-btn" disabled>Next</button>
+        <div class="score hidden" id="score"></div>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        const totalQuestions = 10;
+        const progressFill = document.getElementById('progress-fill');
+        const currentQuestionElement = document.getElementById('current-question');
+        const nextBtn = document.getElementById('next-btn');
+        const optionButtons = document.querySelectorAll('.option-btn');
+        const timerElement = document.getElementById('timer');
+        let score = 0;
+
+        // Timer functionality
+        let timer = 30;
+        let timerInterval = setInterval(() => {
+            timer--;
+            timerElement.textContent = timer;
+            if (timer <= 0) {
+                clearInterval(timerInterval);
+                timerElement.textContent = 'Time’s up!';
+                disableOptions();
+            }
+        }, 1000);
+
+        // Functionality for option buttons
+        optionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                disableOptions();
+                button.style.backgroundColor = button.dataset.answer === "true" ? "green" : "red";
+                if (button.dataset.answer === "true") {
+                    score++;
+                }
+                nextBtn.disabled = false;
+            });
+        });
+
+        // Disable all option buttons after selection
+        function disableOptions() {
+            optionButtons.forEach(button => button.disabled = true);
+        }
+
+        // Next question button functionality
+        nextBtn.addEventListener('click', () => {
+            currentQuestion++;
+            if (currentQuestion <= totalQuestions) {
+                updateQuestion();
+                resetOptions();
+                resetTimer();
+                nextBtn.disabled = true;
+            } else {
+                showScore();
+            }
+        });
+
+        // Update question and progress bar
+        function updateQuestion() {
+            currentQuestionElement.textContent = currentQuestion;
+            progressFill.style.width = `${(currentQuestion / totalQuestions) * 100}%`;
+
+            // Example question update, you can replace this with dynamic questions
+            document.getElementById('question').textContent = "Next question text here...";
+        }
+
+        // Reset options for new question
+        function resetOptions() {
+            optionButtons.forEach(button => {
+                button.disabled = false;
+                button.style.backgroundColor = "";
+            });
+        }
+
+        // Reset timer for next question
+        function resetTimer() {
+            timer = 30;
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timer--;
+                timerElement.textContent = timer;
+                if (timer <= 0) {
+                    clearInterval(timerInterval);
+                    timerElement.textContent = 'Time’s up!';
+                    disableOptions();
+                }
+            }, 1000);
+        }
+
+        // Show the final score
+        function showScore() {
+            clearInterval(timerInterval);
+            document.getElementById('score').textContent = `Your score: ${score}/${totalQuestions}`;
+            document.getElementById('score').classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+        }
+
+    </script>
+</body>
+</html>
