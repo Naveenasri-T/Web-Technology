@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Media Showcase</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Interactive Media Showcase</h1>
+        <p>Explore images, videos, and audio with responsive and interactive controls.</p>
+    </header>
+
+    <!-- Image Section -->
+    <section class="media-section" id="image-section">
+        <h2>Responsive Images</h2>
+        <picture id="media-picture">
+            <source srcset="image-small.jpg" media="(min-width: 800px)">
+            <source srcset="image-small.jpg" media="(min-width: 400px)">
+            <img src="image-small.jpg" alt="Responsive Image">
+        </picture>
+        <button onclick="toggleImage()">Toggle Image</button>
+    </section>
+
+    <!-- Video Section (YouTube Embed) -->
+    <section class="media-section" id="video-section">
+        <h2>Video Player</h2>
+        <iframe id="media-video" 
+            src="https://www.youtube.com/embed/es4x5R-rV9s?si=y5ioi8-s7d8HsNjt"
+            title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
+        </iframe>
+    </section>
+
+    <!-- Audio Section -->
+    <section class="media-section" id="audio-section">
+        <h2>Audio Player</h2>
+        <audio id="media-audio" controls>
+            <source src="sample-audio.mp3" type="audio/mp3">
+            Your browser does not support the audio element.
+        </audio>
+        <button onclick="toggleAudio()">Play/Pause Audio</button>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
